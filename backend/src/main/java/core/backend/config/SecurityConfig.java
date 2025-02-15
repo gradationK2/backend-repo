@@ -37,12 +37,19 @@ public class SecurityConfig {
                         .requestMatchers("/reviews/users/**").permitAll() //리뷰 조회는 로그인 없이 가능
                         //.requestMatchers("/api/food/detail/**").permitAll() // 음식 상세 조회
 
+                        // TODO : GET 요청 중 인증없이 응답해야 하는 엔드포인트
+                        // reviews/users/{userId} : 후기 리스트 조회
+                        // heart/{foodId} : 음식 좋아요 개수 조회
+                        // users/likes/{userId} : 회원이 좋아요한 음식 목록 조회
+                        // users/badge/{userId} : 뱃지 조회
+
                         //인증 필요
                         .requestMatchers("/reviews").authenticated() //리뷰 작성, 수정, 삭제는 로그인 필요
                         .requestMatchers("/heart/**").authenticated() //좋아요 관련 api
                         .requestMatchers("/users/likes/**").authenticated() // 좋아요 목록 조회 로그인 필요
                         .requestMatchers("/users/badge/**").authenticated() // 뱃지 조회 로그인 필요
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증 필요
+
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
