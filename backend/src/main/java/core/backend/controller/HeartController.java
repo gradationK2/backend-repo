@@ -78,8 +78,8 @@ public class HeartController {
         Food food = foodService.findFoodByID(request.getFoodId());
         Member member = memberService.getUser(request.getUserId());
 
-        if (!heartService.isLiked(member, food)){
-            throw new CustomException(ErrorCode.ALREADY_UNLIKED);
+        if (!heartService.isLiked(member, food)){ // 좋아요를 누르지 않은 상태 -> 아무 것도 누르지 않은 경우
+            throw new CustomException(ErrorCode.LIKED_NOT_FOUND);
         }
 
         heartService.deleteUser(member, food);

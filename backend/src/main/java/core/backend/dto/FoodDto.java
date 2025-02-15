@@ -12,13 +12,13 @@ import lombok.Setter;
 @Builder
 public class FoodDto {
     private Long foodId;
-    private String name;
+    private String foodName;
     private String imgUrl;
 
     public static FoodDto fromEntity(Food food) {
         return FoodDto.builder()
                 .foodId(food.getId())
-                .name(food.getName())
+                .foodName(food.getName())
                 .imgUrl(food.getImgUrl())
                 .build();
     }
