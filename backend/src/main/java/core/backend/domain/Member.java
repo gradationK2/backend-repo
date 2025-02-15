@@ -50,6 +50,7 @@ public class Member {
     private String photoUrl;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Review> reviews = new ArrayList<>();
+    @Builder.Default
+    private final List<Review> reviews = new ArrayList<>();
 
 }
