@@ -9,8 +9,6 @@ import core.backend.domain.Review;
 import core.backend.exception.CustomException;
 import core.backend.exception.ErrorCode;
 import core.backend.repository.ReviewRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +34,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public Review createReview(Food food, Member member, String content, Integer spicyLevel) {
+    public void createReview(Food food, Member member, String content, Integer spicyLevel) {
         //디버깅용 로그
         log.info("리뷰 생성 요청: food={}, member={}, content={}, spicyLevel={}",
                 food != null ? food.getId() : "NULL",
@@ -66,12 +64,11 @@ public class ReviewService {
                 .content(content)
                 .spicyLevel(spicyLevel)
                 .build();
-        Review savedReview = reviewRepository.save(review);
-        return savedReview;
+        reviewRepository.save(review);
     }
 
-    public Review updateReview(Long reviewId, String content, Integer spicyLevel) {
-        return reviewRepository.findById(reviewId)
+    public void updateReview(Long reviewId, String content, Integer spicyLevel) {
+        reviewRepository.findById(reviewId)
                 .map(review -> {
                     if (content != null && !content.trim().isEmpty()) {
                         review.setContent(content);
@@ -106,10 +103,6 @@ public class ReviewService {
         } else {
             log.info("DELETE 성공: review_id={}", reviewId);
         }
-    }
-
-    public Review saveReview(Review review) {
-        return reviewRepository.save(review);
     }
 }
 

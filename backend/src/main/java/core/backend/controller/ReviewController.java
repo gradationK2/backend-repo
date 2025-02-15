@@ -5,17 +5,15 @@ import java.util.*;
 import core.backend.domain.Food;
 import core.backend.domain.Member;
 import core.backend.domain.Review;
-import core.backend.domain.ReviewLike;
+import core.backend.dto.review.ReviewDeleteRequest;
 import core.backend.dto.review.ReviewFormRequest;
 import core.backend.dto.review.ReviewUpdateRequest;
-import core.backend.dto.review.ReviewVoteRequest;
 import core.backend.exception.CustomException;
 import core.backend.exception.ErrorCode;
 import core.backend.service.FoodService;
 import core.backend.service.MemberService;
 import core.backend.service.ReviewLikeService;
 import core.backend.service.ReviewService;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +28,6 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final FoodService foodService;
     private final MemberService memberService;
-    private final ReviewLikeService reviewLikeService;
 
     @GetMapping("/users")
     public ResponseEntity<?> getReviews() {
@@ -64,21 +61,18 @@ public class ReviewController {
                 .body(Map.of("message", "후기 작성 완료"));
     }
 
-    @PutMapping("/{reviewId}")
-    public ResponseEntity<?> updateReview(@PathVariable("reviewId") Long reviewId,
-                                            @Valid @RequestBody ReviewUpdateRequest request) {
-        Review review = reviewService.getReviewByReview(reviewId);
-        reviewService.updateReview(reviewId, request.getContent(), request.getSpicyLevel());
-
+    @PutMapping
+    public ResponseEntity<?> updateReview(@Valid @RequestBody ReviewUpdateRequest request) {
+        reviewService.updateReview(request.getReviewId(), request.getContent(), request.getSpicyLevel());
         return ResponseEntity.ok().body(Map.of("message","후기 수정 완료"));
     }
 
-    @DeleteMapping("/{reviewId}")
-    public ResponseEntity<?> deleteReview(@PathVariable("reviewId") Long reviewId) {
+    @DeleteMapping
+    public ResponseEntity<?> deleteReview(@Valid @RequestBody ReviewDeleteRequest request) {
         //리뷰 삭제 실행
-        Review review = reviewService.getReviewByReview(reviewId);
+        Review review = reviewService.getReviewByReview(request.getReviewId());
         Member member = review.getMember();
-        reviewService.deleteReview(reviewId);
+        reviewService.deleteReview(request.getReviewId());
         //전체 리뷰 리스트 갱신
         List<Review> allReviews = reviewService.getReviews();
         //사용자의 리뷰 갱신
