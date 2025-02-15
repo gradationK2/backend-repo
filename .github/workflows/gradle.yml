@@ -15,10 +15,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend  # 프로젝트 경로
-
+    
+    permissions:
+      contents: read
+    
     steps:
     - uses: actions/checkout@v4
     
@@ -30,32 +30,25 @@ jobs:
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
+    
+    - name: Change wrapper permissions
+      run: chmod +x ./backend/gradlew
+    
+    - name: Build with Gradle
+      working-directory: ./backend
+      run: ./gradlew build -x test
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
       with:
-        gradle-home-cache-cleanup: true
-
-    - name: Build with Gradle (Skip Tests)
-      run: ./gradlew build -x test # 여기서 테스트 제외
-
-    # JAR 파일 생성 (옵션)
-    - name: Build JAR
-      run: ./gradlew bootJar -x test
-
-    # 빌드 결과물 저장 (옵션)
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: build-artifacts
+        name: backend-jar
         path: backend/build/libs/*.jar
 
   dependency-submission:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
-        
     permissions:
       contents: write
-      
+    
     steps:
     - uses: actions/checkout@v4
     
@@ -64,6 +57,8 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        
-    - name: Generate and submit dependency graph
+    
+    - name: Generate dependency graph
       uses: gradle/actions/dependency-submission@v3
+      with:
+        working-directory: ./backend
