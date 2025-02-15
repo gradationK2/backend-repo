@@ -1,11 +1,13 @@
-name: Java CI with Gradle
+name: Java CI/CD with Gradle
+
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+
 jobs:
-  build:
+  build-and-deploy:    # 하나의 job으로 통합
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -29,19 +31,6 @@ jobs:
       working-directory: ./backend
       run: ./gradlew build -x test
     
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: backend-jar
-        path: backend/build/libs/*.jar
-
-    # Download artifact for deployment
-    - name: Download artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: backend-jar
-        path: backend/build/libs
-
     # Deploy to server
     - name: Deploy to Server
       uses: appleboy/ssh-action@v0.1.10
@@ -50,5 +39,5 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.PRIVATE_KEY }}
         port: ${{ secrets.PORT }}
-        script:
-         ~/deploy.sh
+        script: |
+          ~/deploy.sh
