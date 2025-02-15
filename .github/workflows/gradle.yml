@@ -61,4 +61,4 @@ jobs:
     - name: Generate dependency graph
       uses: gradle/actions/dependency-submission@v3
       with:
-        working-directory: ./backend
+        build-root-directory: ./backend
