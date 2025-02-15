@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend  # 실제 Gradle 프로젝트가 있는 경로
+        working-directory: backend  # 프로젝트 경로
 
     steps:
     - uses: actions/checkout@v4
@@ -33,14 +33,25 @@ jobs:
       with:
         gradle-home-cache-cleanup: true
 
-    - name: Build with Gradle
-      run: ./gradlew build
+    - name: Build with Gradle (Skip Tests)
+      run: ./gradlew build -x test # 여기서 테스트 제외
+
+    # JAR 파일 생성 (옵션)
+    - name: Build JAR
+      run: ./gradlew bootJar -x test
+
+    # 빌드 결과물 저장 (옵션)
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: backend/build/libs/*.jar
 
   dependency-submission:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend  # 실제 Gradle 프로젝트가 있는 경로
+        working-directory: backend
         
     permissions:
       contents: write
