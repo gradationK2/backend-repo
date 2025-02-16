@@ -42,17 +42,23 @@ public class FoodService {
     //특정 음식 상세 조회(매운맛 비교 포함)
     @Transactional
     public FoodDetailDto getFoodDetail(Long foodId) {
-        Food food = foodRepository.findById(foodId)
+        //fetch join적용
+        Food food = foodRepository.findByIdWithReviewsAndHearts(foodId)
                 .orElseThrow(() -> new CustomException(ErrorCode.FOOD_NOT_FOUND));
+//        Food food = foodRepository.findById(foodId)
+//                .orElseThrow(() -> new CustomException(ErrorCode.FOOD_NOT_FOUND));
 
-        //음식 리뷰 가져오기
-        List<Review> reviews = reviewRepository.findByFood(food);
-        List<ReviewDto> reviewDtos = reviews.stream()
+        //음식 리뷰 가져오기(이미 fetch join으로 가져와서 추가 쿼리 발생 없음)
+        List<ReviewDto> reviewDtos = food.getReviews().stream()
                 .map(ReviewDto::fromEntity)
                 .collect(Collectors.toList());
+//        List<Review> reviews = reviewRepository.findByFood(food);
+//        List<ReviewDto> reviewDtos = reviews.stream()
+//                .map(ReviewDto::fromEntity)
+//                .collect(Collectors.toList());
 
         //평균 매운맛 계산(후기 기반)
-        double avgSpicyLevel = reviews.stream()
+        double avgSpicyLevel = food.getReviews().stream()
                 .mapToInt(Review::getSpicyLevel) // 1~5단계 점수 가져옴
                 .average()
                 .orElse(0);
@@ -76,7 +82,8 @@ public class FoodService {
                 spicyLevelText, // 후기 기반 매운맛
                 spicinessComparison, // 타바스코와 비교 매운맛
                 reviewDtos, // 리뷰 리스트
-                popularFoods // 인기 음식 리스트
+                popularFoods, // 인기 음식 리스트
+                food.getHeartCount()
         );
     }
     

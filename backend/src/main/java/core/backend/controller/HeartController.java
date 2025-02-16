@@ -36,13 +36,6 @@ public class HeartController {
         return foods.stream().map(FoodDto::fromEntity).toList();
     }
 
-    @GetMapping("/heart/{foodId}")
-    public ResponseEntity<?> getSizeOfHearts(@PathVariable("foodId") Long foodId){
-        Food food = foodService.findFoodByID(foodId);
-        int size = heartService.getHeartsByFood(food).size();
-        return ResponseEntity.ok(Map.of("heartCount", String.valueOf(size)));
-    }
-
 
     @GetMapping("/users/badge/{userId}")
     public Map<String, String> getBadge(@PathVariable("userId") Long userId) {
