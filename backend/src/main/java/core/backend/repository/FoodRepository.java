@@ -25,4 +25,7 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
     //fetch join을 이용해 음식과 연관된 리뷰와 좋아요를 한 번에 조회
     @Query("select f from Food f left join fetch f.reviews left join fetch f.hearts where f.id = :foodId")
     Optional<Food> findByIdWithReviewsAndHearts(@Param("foodId") Long foodId);
+
+    @Query("SELECT f FROM Food f LEFT JOIN f.hearts h GROUP BY f ORDER BY COUNT(h) DESC LIMIT 2")
+    List<Food> findTop2MostLikedFoods();
 }
