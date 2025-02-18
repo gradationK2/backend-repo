@@ -40,4 +40,9 @@ public class MemberService {
         if (reviewCount % 5 == 0)
             log.info(String.format("%s의 배지 : %s (작성 글 개수 :%s)", member.getName(), member.getBadge(), reviewCount));
     }
+
+    public int requiredReviewCount(int currentReviews) {
+        int target = (currentReviews / 5 + 1) * 5;
+        return target - currentReviews;
+    }
 }

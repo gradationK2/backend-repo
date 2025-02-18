@@ -49,6 +49,14 @@ public class HeartController {
         return badgeInfo;
     }
 
+    @GetMapping("/users/badge/reviewcount/{userId}")
+    public ResponseEntity<?> updateBadge(@PathVariable("userId") Long memberId) {
+        Member member = memberService.getUser(memberId);
+        int currentReviewCount = member.getReviews().size();
+        int requiredReviewCount = memberService.requiredReviewCount(currentReviewCount);
+        return ResponseEntity.ok().body(Map.of("currentCount",currentReviewCount, "requiredCount", requiredReviewCount));
+    }
+
     @PostMapping("/users/heart")
     public ResponseEntity<?> likeFoodByUser(@Valid @RequestBody MemberLikeFoodRequest request) {
         request.validate(); // 요청데이터 검증하려고 추가..
