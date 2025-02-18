@@ -42,17 +42,23 @@ public class FoodService {
     //특정 음식 상세 조회(매운맛 비교 포함)
     @Transactional
     public FoodDetailDto getFoodDetail(Long foodId) {
+        //fetch join적용(전:reviews와 hearts를 함께 가져오려 해서(??) MultipleBagFetchException 발생 -> 후: List형을 Set형으로 변경 혹은 쿼리 분리 등)
+//        Food food = foodRepository.findByIdWithReviewsAndHearts(foodId)
+//                .orElseThrow(() -> new CustomException(ErrorCode.FOOD_NOT_FOUND));
         Food food = foodRepository.findById(foodId)
                 .orElseThrow(() -> new CustomException(ErrorCode.FOOD_NOT_FOUND));
 
-        //음식 리뷰 가져오기
-        List<Review> reviews = reviewRepository.findByFood(food);
-        List<ReviewDto> reviewDtos = reviews.stream()
+        //음식 리뷰 가져오기(이미 fetch join으로 가져와서 추가 쿼리 발생 없음)
+        List<ReviewDto> reviewDtos = food.getReviews().stream()
                 .map(ReviewDto::fromEntity)
                 .collect(Collectors.toList());
+//        List<Review> reviews = reviewRepository.findByFood(food);
+//        List<ReviewDto> reviewDtos = reviews.stream()
+//                .map(ReviewDto::fromEntity)
+//                .collect(Collectors.toList());
 
         //평균 매운맛 계산(후기 기반)
-        double avgSpicyLevel = reviews.stream()
+        double avgSpicyLevel = food.getReviews().stream()
                 .mapToInt(Review::getSpicyLevel) // 1~5단계 점수 가져옴
                 .average()
                 .orElse(0);
@@ -62,12 +68,15 @@ public class FoodService {
         //타바스코 소스와 비교
         String spicinessComparison = compareSpiciness(food.getScoville());
 
-        //가장 인기 있는 음식(좋아요 순 정렬 후 2개 가져오기)
-        List<FoodDto> popularFoods = foodRepository.findAll().stream()
-                .sorted(Comparator.comparingInt(Food::getHeartCount).reversed()) //좋아요 순 정렬
-                .limit(2)
+        //가장 인기 있는 음식(좋아요 내림차순 정렬 기준 2개 가져오기)
+        List<Food> top2MostLikedFoods = foodRepository.findTop2MostLikedFoods();
+        List<FoodDto> popularFoods = top2MostLikedFoods
+                .stream()
                 .map(FoodDto::fromEntity)
                 .collect(Collectors.toList());
+        top2MostLikedFoods.forEach(t ->
+                log.info("foodName: {}, foodId: {}, foodHeartSize: {}",
+                        t.getName(), t.getId(), t.getHeartCount()));
 
         return new FoodDetailDto(
                 food.getImgUrl(),
@@ -76,7 +85,8 @@ public class FoodService {
                 spicyLevelText, // 후기 기반 매운맛
                 spicinessComparison, // 타바스코와 비교 매운맛
                 reviewDtos, // 리뷰 리스트
-                popularFoods // 인기 음식 리스트
+                popularFoods, // 인기 음식 리스트
+                food.getHeartCount()
         );
     }
     

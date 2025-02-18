@@ -19,4 +19,5 @@ public class FoodDetailDto {
     private String spicinessComparison; //타바스코 소스 비교
     private List<ReviewDto> reviews; //리뷰 리스트
     private List<FoodDto> popularFoods; //가장 인기 있는 음식 리스트
+    private Integer heartSize;
 }
