@@ -12,6 +12,7 @@ import core.backend.exception.ErrorCode;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,24 +32,32 @@ public class AuthController {
     //회원가입 API
     @PostMapping("/signup")
     public String signup(@Valid @RequestBody MemberSignupRequest request){
-        //이미 존재하는 사용자 확인
-        if(memberRepository.findByEmail(request.getEmail()).isPresent()){
-            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        try {
+            //이미 존재하는 이메일 확인
+            if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
+                throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
+            }
+            // 이미 존재하는 닉네임 확인
+            if (memberRepository.findByName(request.getName()).isPresent()) {
+                throw new CustomException(ErrorCode.NAME_ALREADY_EXISTS);
+            }
+
+            //새로운 사용자 객체 생성, 저장
+            Member member = Member.builder()
+                    .email(request.getEmail())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .name(request.getName())
+                    .nationality(request.getNationality())
+                    .role(RoleType.USER)
+                    .badge(BadgeType.LEVEL_ZERO)
+                    .build();
+
+            memberRepository.save(member);
+
+            return "회원가입 성공";
+        }catch (DataIntegrityViolationException e){
+            throw new CustomException(ErrorCode.NAME_ALREADY_EXISTS);
         }
-
-        //새로운 사용자 객체 생성, 저장
-        Member member = Member.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .name(request.getName())
-                .nationality(request.getNationality())
-                .role(RoleType.USER)
-                .badge(BadgeType.LEVEL_ZERO)
-                .build();
-
-        memberRepository.save(member);
-
-        return "회원가입 성공";
     }
 
     //로그인 API(JWT 발급)

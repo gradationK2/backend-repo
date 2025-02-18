@@ -27,6 +27,7 @@ public class Member {
     @Column(unique = true, nullable = false) // 중복 방지, 필수값 설정
     private String email;
 
+    @Column(unique = true)
     private String name;
 
     @Column(nullable = false) // 필수값 설정
