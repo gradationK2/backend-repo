@@ -1,11 +1,13 @@
 package core.backend.config;
 
+import java.util.Arrays;
 import core.backend.jwt.JwtFilter;
 import core.backend.service.MemberDetailService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 // Spring Security 설정 클래스
 @Configuration
@@ -28,9 +33,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) //CSRF 비활성화 (REST API에서는 필요 없음)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // cors 설정
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //세션 비활성화 (JWT 인증 사용)
                 .authorizeHttpRequests(auth -> auth
                         //인증 없이 접근 가능
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll() //로그인, 회원가입은 인증 없이 접근 가능
                         .requestMatchers("/api/food/**").permitAll() //음식 리스트, 상세 조회, 검색
                         .requestMatchers("/api/food/upload").permitAll() // 파일 업로드는 인증 없이 접근 가능
@@ -63,6 +70,20 @@ public class SecurityConfig {
         return http.build();
     }
 
+    @Bean // cors 오류 해결
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(Arrays.asList("http://www.asd1.store"));
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // 요청
+        configuration.setExposedHeaders(Arrays.asList("Authorization")); // 응답
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // 하위 디렉토리
+        return source;
+    }
 
     // 비밀번호 암호화를 위한 passwordEncoder설정
     @Bean
