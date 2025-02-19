@@ -16,8 +16,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 
 // 인증(회원가입, 로그인, 로그아웃) API 컨트롤러
 @RestController
@@ -73,8 +71,15 @@ public class AuthController {
         }
 
         //jwt 토큰 발급 후 반환
-        return jwtUtil.generateToken(foundMember.getEmail(), foundMember.getRole().name());
+        return jwtUtil.generateToken(foundMember);
     }
+
+//    // 구글 로그인
+//    @PostMapping("/google")
+//    public ResponseEntity<AuthResponse> googleLogin(@RequestBody GoogleLoginRequest request){
+//        AuthResponse response = authService.loginWithGoogle(request.getToken());
+//        return ResponseEntity.ok(response);
+//    }
 
     //로그아웃 API(클라이언트에서 JWT 삭제)
     @PostMapping("/logout")

@@ -18,8 +18,8 @@ public enum ErrorCode {
     UNLIKED_NOT_FOUND(HttpStatus.BAD_REQUEST, "싫어요가 등록된 상태가 아닙니다."),
     UNLIKED_LIKED_NOT_FOUND(HttpStatus.BAD_REQUEST, "좋아요/싫어요가 등록된 상태가 아닙니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."),
-    INVALID_INPUT(HttpStatus.BAD_REQUEST, "입력값이 잘못되었습니다.");
-
+    INVALID_INPUT(HttpStatus.BAD_REQUEST, "입력값이 잘못되었습니다."),
+    INVALID_GOOGLE_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 구글 토큰입니다.");
 
     private final HttpStatus status;
     private final String message;

@@ -39,7 +39,7 @@ public class Member {
     private RoleType role;
 
     @Column(nullable = false)
-    private String nationality;
+    private String nationality = "UNKNOWN"; // 기본값 설정
 
     @Column(updatable = false) // 회원가입 시 자동 생성(수정 불가)
     @CreationTimestamp // 쿼리 Insert 시 현재시간 저장
