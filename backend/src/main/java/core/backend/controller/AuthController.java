@@ -47,7 +47,7 @@ public class AuthController {
                 .nationality(request.getNationality())
                 .role(RoleType.USER)
                 .badge(BadgeType.REVIEW_0)
-                .build()
+                .build();
 
             memberRepository.save(member);
 
