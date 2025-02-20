@@ -39,16 +39,15 @@ public class AuthController {
             if (memberRepository.findByName(request.getName()).isPresent()) {
                 throw new CustomException(ErrorCode.NAME_ALREADY_EXISTS);
             }
-
-            //새로운 사용자 객체 생성, 저장
-            Member member = Member.builder()
-                    .email(request.getEmail())
-                    .password(passwordEncoder.encode(request.getPassword()))
-                    .name(request.getName())
-                    .nationality(request.getNationality())
-                    .role(RoleType.USER)
-                    .badge(BadgeType.LEVEL_ZERO)
-                    .build();
+        //새로운 사용자 객체 생성, 저장
+        Member member = Member.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .name(request.getName())
+                .nationality(request.getNationality())
+                .role(RoleType.USER)
+                .badge(BadgeType.REVIEW_0)
+                .build()
 
             memberRepository.save(member);
 
