@@ -39,6 +39,7 @@ public class Member {
     private RoleType role;
 
     @Column(nullable = false)
+    @Builder.Default
     private String nationality = "UNKNOWN"; // 기본값 설정
 
     @Column(updatable = false) // 회원가입 시 자동 생성(수정 불가)
