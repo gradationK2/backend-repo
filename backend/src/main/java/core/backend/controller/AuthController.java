@@ -13,6 +13,7 @@ import core.backend.exception.ErrorCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,11 +33,11 @@ public class AuthController {
     public String signup(@Valid @RequestBody MemberSignupRequest request){
         try {
             //이미 존재하는 이메일 확인
-            if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
+            if (request.getEmail() != null && memberRepository.findByEmail(request.getEmail()).isPresent()) {
                 throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
             }
             // 이미 존재하는 닉네임 확인
-            if (memberRepository.findByName(request.getName()).isPresent()) {
+            if (request.getName() != null && memberRepository.findByName(request.getName()).isPresent()) {
                 throw new CustomException(ErrorCode.NAME_ALREADY_EXISTS);
             }
         //새로운 사용자 객체 생성, 저장
@@ -55,6 +56,24 @@ public class AuthController {
         }catch (DataIntegrityViolationException e){
             throw new CustomException(ErrorCode.NAME_ALREADY_EXISTS);
         }
+    }
+
+    //이메일 중복 확인 API
+    @GetMapping("/check-email")
+    public ResponseEntity<?> checkEmail(@RequestParam(name = "email") String email){
+        if(memberRepository.findByEmail(email).isPresent()){
+            return ResponseEntity.badRequest().body("이미 사용 중인 이메일입니다.");
+        }
+        return ResponseEntity.ok("사용 가능한 이메일입니다.");
+    }
+
+    //닉네임 중복 확인 API
+    @GetMapping("/check-name")
+    public ResponseEntity<?> checkName(@RequestParam(name = "name") String name){
+        if(memberRepository.findByName(name).isPresent()){
+            return ResponseEntity.badRequest().body("이미 사용 중인 닉네임입니다.");
+        }
+        return ResponseEntity.ok("사용 가능한 닉네임입니다.");
     }
 
     //로그인 API(JWT 발급)

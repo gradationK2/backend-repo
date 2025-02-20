@@ -20,7 +20,8 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "입력값이 잘못되었습니다."),
     INVALID_GOOGLE_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 구글 토큰입니다."),
-    INVALID_BADGE_WORKING(HttpStatus.BAD_REQUEST, "배지의 정보가 잘못되었습니다.");
+    INVALID_BADGE_WORKING(HttpStatus.BAD_REQUEST, "배지의 정보가 잘못되었습니다."),
+    INVALID_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다. 필수 값을 입력하세요.");
 
     private final HttpStatus status;
     private final String message;
