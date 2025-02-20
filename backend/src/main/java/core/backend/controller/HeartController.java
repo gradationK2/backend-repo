@@ -1,5 +1,6 @@
 package core.backend.controller;
 
+import core.backend.domain.BadgeType;
 import core.backend.domain.Food;
 import core.backend.domain.Heart;
 import core.backend.domain.Member;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -36,25 +38,33 @@ public class HeartController {
         return foods.stream().map(FoodDto::fromEntity).toList();
     }
 
-
     @GetMapping("/users/badge/{userId}")
     public Map<String, String> getBadge(@PathVariable("userId") Long userId) {
         Member member = memberService.getUser(userId);
-        Map<String, String> badgeInfo = new HashMap<>();
-//        badgeInfo.put("?", member.getBadge().); TODO : 무엇을 더 줘야 할 지 채우기
-        badgeInfo.put("userId", member.getId().toString());
-        badgeInfo.put("userName", member.getName());
-        badgeInfo.put("badgeName", member.getBadge().getLabel());
-        badgeInfo.put("icon_url", ""); // TODO : 뱃지 경로
-        return badgeInfo;
+        BadgeType badge = member.getBadge();
+        return memberService.getBadgeInfo(member, badge);
     }
 
-    @GetMapping("/users/badge/reviewcount/{userId}")
-    public ResponseEntity<?> updateBadge(@PathVariable("userId") Long memberId) {
-        Member member = memberService.getUser(memberId);
-        int currentReviewCount = member.getReviews().size();
-        int requiredReviewCount = memberService.requiredReviewCount(currentReviewCount);
-        return ResponseEntity.ok().body(Map.of("currentCount",currentReviewCount, "requiredCount", requiredReviewCount));
+
+    @GetMapping("/users/badge/list/{userId}")
+    public ResponseEntity<?> getRequiredReviewCount(@PathVariable("userId") Long userId) {
+        Member member = memberService.getUser(userId);
+        int reviewCount = member.getReviews().size();
+        List<BadgeType> earnedBadges = BadgeType.getEarnedBadges(reviewCount);
+
+        // BadgeType 객체들을 DTO로 변환
+        List<Map<String, Object>> badgeDTOs = earnedBadges.stream()
+                .map(badge -> {
+                    Map<String, Object> badgeInfo = new HashMap<>();
+                    badgeInfo.put("name", badge.name());
+                    badgeInfo.put("label", badge.getLabel());
+                    badgeInfo.put("reviewCount", badge.getReviewCount());
+                    badgeInfo.put("imagePath", badge.getImagePath());
+                    return badgeInfo;
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(badgeDTOs);
     }
 
     @PostMapping("/users/heart")

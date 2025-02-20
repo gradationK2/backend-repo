@@ -1,5 +1,6 @@
 package core.backend.service;
 
+import java.util.Map;
 import core.backend.domain.BadgeType;
 import core.backend.domain.Member;
 import core.backend.exception.CustomException;
@@ -7,7 +8,10 @@ import core.backend.exception.ErrorCode;
 import core.backend.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import java.util.HashMap;
+
 
 @Slf4j
 @Service
@@ -40,5 +44,21 @@ public class MemberService {
             }
         }
         throw new CustomException(ErrorCode.INVALID_BADGE_WORKING);
+    }
+
+    public Map<String, String> getBadgeInfo(Member member, BadgeType badge) {
+        Map<String, String> badgeInfo = new HashMap<>();
+        int currentReviewCount = member.getReviews().size();
+        int requiredReviewCount = requiredReviewCount(currentReviewCount);
+
+        badgeInfo.put("userId", member.getId().toString());
+        badgeInfo.put("userName", member.getName());
+        badgeInfo.put("badgeName", badge.name());
+        badgeInfo.put("badgeLabel", badge.getLabel());
+        badgeInfo.put("badgeReviewCount", String.valueOf(badge.getReviewCount()));
+        badgeInfo.put("badgeImagePath", badge.getImagePath());
+        badgeInfo.put("currentCount", String.valueOf(currentReviewCount));
+        badgeInfo.put("requiredCount", String.valueOf(requiredReviewCount));
+        return badgeInfo;
     }
 }
