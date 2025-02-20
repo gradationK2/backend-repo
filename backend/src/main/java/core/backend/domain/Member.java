@@ -51,8 +51,15 @@ public class Member {
 
     private String photoUrl;
 
+    private String refreshToken;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private final List<Review> reviews = new ArrayList<>();
+
+    //refresh token 업데이트
+    public void updateRefreshToken(String refreshToken){
+        this.refreshToken = refreshToken;
+    }
 
 }

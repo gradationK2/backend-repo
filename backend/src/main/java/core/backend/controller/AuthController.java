@@ -17,6 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 // 인증(회원가입, 로그인, 로그아웃) API 컨트롤러
 @RestController
@@ -78,7 +81,7 @@ public class AuthController {
 
     //로그인 API(JWT 발급)
     @PostMapping("/login")
-    public String login(@Valid @RequestBody MemberLoginRequest request){
+    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody MemberLoginRequest request){
         //이메일로 사용자 조회
         Member foundMember = memberRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -88,20 +91,62 @@ public class AuthController {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
-        //jwt 토큰 발급 후 반환
-        return jwtUtil.generateToken(foundMember);
+        String accessToken = jwtUtil.generateToken(foundMember);
+        String refreshToken = jwtUtil.generateRefreshToken(foundMember);
+
+        // refresh token db에 저장
+        foundMember.updateRefreshToken(refreshToken);
+        memberRepository.save(foundMember);
+
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("accessToken", accessToken);
+        tokens.put("refreshToken", refreshToken);
+
+        return ResponseEntity.ok(tokens);
     }
 
-//    // 구글 로그인
-//    @PostMapping("/google")
-//    public ResponseEntity<AuthResponse> googleLogin(@RequestBody GoogleLoginRequest request){
-//        AuthResponse response = authService.loginWithGoogle(request.getToken());
-//        return ResponseEntity.ok(response);
-//    }
+    // 자동 로그인
+    @PostMapping("/refresh")
+    public ResponseEntity<Map<String, String>> refreshToken(@RequestBody Map<String, String> request){
+        String refreshToken = request.get("refreshToken");
+
+        if(!jwtUtil.validateToken(refreshToken)){
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        //사용자 조회
+        String email = jwtUtil.extractEmail(refreshToken);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if(!refreshToken.equals(member.getRefreshToken())){
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        //새 access token 생성
+        String newAccessToken = jwtUtil.generateToken(member);
+        String newRefreshToken = jwtUtil.generateRefreshToken(member);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("accessToken", newAccessToken);
+        response.put("refreshToken", newRefreshToken);
+
+        return ResponseEntity.ok(response);
+    }
 
     //로그아웃 API(클라이언트에서 JWT 삭제)
     @PostMapping("/logout")
-    public String logout(){
-        return "로그아웃 성공";
+    public ResponseEntity<String> logout(@RequestBody Map<String, String> request){
+        String refreshToken = request.get("refreshToken");
+
+        String email = jwtUtil.extractEmail(refreshToken);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        //refresh token 제거
+        member.updateRefreshToken(null);
+        memberRepository.save(member);
+
+        return ResponseEntity.ok("로그아웃 성공");
     }
 }

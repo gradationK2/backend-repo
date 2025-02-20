@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import core.backend.domain.Member;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.security.Security;
 import java.util.Base64;
 import java.util.Date;
 import java.util.logging.Logger;
@@ -18,8 +20,10 @@ import java.util.logging.Logger;
 public class JwtUtil {
 
     private static final Logger logger = Logger.getLogger(JwtUtil.class.getName());
-    private final Key key;
     private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1시간 유효
+    private final long REFRESH_TOKEN_EXPIRATION = 1000*60*60*24*7; //7일
+
+    private final Key key;
 
     //환경 변수에서 jwt_secret 가져오기
     public JwtUtil(){
@@ -49,6 +53,16 @@ public class JwtUtil {
 
         logger.info("Generated JWT Token:" + token);
         return token;
+    }
+
+    //Refresh Token 생성
+    public String generateRefreshToken(Member member){
+        return Jwts.builder()
+                .setSubject(member.getEmail())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
     }
 
     //JWT 토큰에서 이메일 추출
