@@ -43,7 +43,7 @@ public class AuthController {
                 .name(request.getName())
                 .nationality(request.getNationality())
                 .role(RoleType.USER)
-                .badge(BadgeType.LEVEL_ZERO)
+                .badge(BadgeType.REVIEW_0)
                 .build();
 
         memberRepository.save(member);
