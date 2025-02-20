@@ -41,7 +41,7 @@ public class HeartController {
     public Map<String, String> getBadge(@PathVariable("userId") Long userId) {
         Member member = memberService.getUser(userId);
         Map<String, String> badgeInfo = new HashMap<>();
-        badgeInfo.put("badgeLevel", member.getBadge().getLevel());
+//        badgeInfo.put("?", member.getBadge().); TODO : 무엇을 더 줘야 할 지 채우기
         badgeInfo.put("userId", member.getId().toString());
         badgeInfo.put("userName", member.getName());
         badgeInfo.put("badgeName", member.getBadge().getLabel());
