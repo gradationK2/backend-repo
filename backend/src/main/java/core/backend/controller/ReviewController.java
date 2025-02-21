@@ -5,6 +5,7 @@ import java.util.*;
 import core.backend.domain.Food;
 import core.backend.domain.Member;
 import core.backend.domain.Review;
+import core.backend.dto.review.ReviewDeleteAllRequest;
 import core.backend.dto.review.ReviewDeleteRequest;
 import core.backend.dto.review.ReviewFormRequest;
 import core.backend.dto.review.ReviewUpdateRequest;
@@ -82,5 +83,17 @@ public class ReviewController {
         return ResponseEntity.ok().body(Map.of(
                 "message","후기 삭제 완료",
                 "allReviews", allReviews));
+    }
+
+    @DeleteMapping("/del-all")
+    public ResponseEntity<?> deleteAllReview(@Valid @RequestBody ReviewDeleteAllRequest request) {
+        Member member = memberService.getUser(request.getUserId());
+
+        reviewService.deleteAllReview(member);
+
+        int reviewCount = reviewService.getReviewsByUser(member.getId()).size();
+        memberService.updateBadge(member, reviewCount);
+
+        return ResponseEntity.ok().body(Map.of("message","후기 전체 삭제 완료"));
     }
 }

@@ -96,4 +96,17 @@ public class HeartController {
         heartService.deleteUser(member, food);
         return ResponseEntity.ok().body(Map.of("message","좋아요 취소 완료"));
     }
+
+    @GetMapping("/users/info/{userId}")
+    public ResponseEntity<?> getMemberInfo(@PathVariable("userId") Long userId) {
+        Number userPercent = memberService.getUserPercent(userId);
+        Member member = memberService.getUser(userId);
+        return ResponseEntity.ok().body(Map.of(
+                "name", member.getName(),
+                "profileImagePath", member.getPhotoUrl() != null ? member.getPhotoUrl() : "",
+                "reviews", String.valueOf(member.getReviews().size()),
+                "hearts", String.valueOf(heartService.getHeartsByUser(member).size()),
+                "percent", String.valueOf(userPercent)
+        ));
+    }
 }
