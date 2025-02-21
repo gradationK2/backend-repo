@@ -103,7 +103,7 @@ public class HeartController {
         Member member = memberService.getUser(userId);
         int reviews = member.getReviews().size();
         return ResponseEntity.ok().body(Map.of(
-                "userId", member.getId(),
+                "userId", String.valueOf(member.getId()),
                 "name", member.getName(),
                 "profileImagePath", member.getPhotoUrl() != null ? member.getPhotoUrl() : "",
                 "reviews", String.valueOf(reviews),
