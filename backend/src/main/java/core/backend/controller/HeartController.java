@@ -101,11 +101,14 @@ public class HeartController {
     public ResponseEntity<?> getMemberInfo(@PathVariable("userId") Long userId) {
         Number userPercent = memberService.getUserPercent(userId);
         Member member = memberService.getUser(userId);
+        int reviews = member.getReviews().size();
         return ResponseEntity.ok().body(Map.of(
+                "userId", member.getId(),
                 "name", member.getName(),
                 "profileImagePath", member.getPhotoUrl() != null ? member.getPhotoUrl() : "",
-                "reviews", String.valueOf(member.getReviews().size()),
+                "reviews", String.valueOf(reviews),
                 "hearts", String.valueOf(heartService.getHeartsByUser(member).size()),
+                "badges", String.valueOf(BadgeType.getBadgeCount(reviews)),
                 "percent", String.valueOf(userPercent)
         ));
     }
