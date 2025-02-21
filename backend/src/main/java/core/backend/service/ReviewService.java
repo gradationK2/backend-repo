@@ -8,6 +8,7 @@ import core.backend.domain.Member;
 import core.backend.domain.Review;
 import core.backend.exception.CustomException;
 import core.backend.exception.ErrorCode;
+import core.backend.repository.ReviewLikeRepository;
 import core.backend.repository.ReviewRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class ReviewService {
+    private final ReviewLikeRepository reviewLikeRepository;
     private final ReviewRepository reviewRepository;
 
     public List<Review> getReviews() {
@@ -102,6 +104,20 @@ public class ReviewService {
             throw new RuntimeException("DELETE 실패: review_id=" + reviewId);
         } else {
             log.info("DELETE 성공: review_id={}", reviewId);
+        }
+    }
+
+    @Transactional
+    public void deleteAllReview(Member member) {
+        // ReviewLike 먼저 삭제
+        reviewLikeRepository.deleteAllByReviewIn(
+                reviewRepository.findAllByMemberId(member.getId())
+        );
+        // Review 삭제
+        reviewRepository.deleteAllByMember(member);
+        List<Review> allByMemberId = reviewRepository.findAllByMemberId(member.getId());
+        if (!allByMemberId.isEmpty()) {
+            throw new RuntimeException("DELETE 실패: member_id=" + member.getId());
         }
     }
 }
