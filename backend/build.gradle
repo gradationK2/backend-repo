@@ -46,6 +46,10 @@ dependencies {
     // db엑셀 데이터 읽기
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
     implementation 'org.apache.commons:commons-csv:1.10.0'
+
+    //OAuth2
+    implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 }
 
 tasks.named('test') {
