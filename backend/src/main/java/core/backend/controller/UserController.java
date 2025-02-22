@@ -27,11 +27,11 @@ public class UserController {
     private final MemberRepository memberRepository;
 
     //현재 로그인한 사용자 프로필 조회
-    @GetMapping("/me")
-    public Member getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
-        return memberRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-    }
+//    @GetMapping("/me")
+//    public Member getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
+//        return memberRepository.findByEmail(userDetails.getUsername())
+//                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+//    }
 
     //현재 로그인한 사용자 프로필 수정
     @PutMapping("/me")
@@ -57,7 +57,7 @@ public class UserController {
         return response;
     }
 
-    @GetMapping("/me/advance")
+    @GetMapping("/me") // 프론트에서 정보를 합쳐달라고 하여 수정함
     public ResponseEntity<?> getUserProfileAdvanced(@AuthenticationPrincipal UserDetails userDetails) {
         Member member = memberRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
