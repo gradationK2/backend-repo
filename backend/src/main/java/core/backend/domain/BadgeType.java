@@ -60,7 +60,17 @@ public enum BadgeType {
 
         return earnedBadges;
     }
-
+    public static Integer getBadgeCount(int reviewCount) {
+        int badgeCount = 0;
+        for (BadgeType badge : BadgeType.values()) {
+            if (badge.getReviewCount() == 0)
+                continue;
+            if (badge.getReviewCount() <= reviewCount) {
+                badgeCount++;
+            }
+        }
+        return badgeCount;
+    }
 }
 
 /**

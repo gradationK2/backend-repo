@@ -8,7 +8,6 @@ import core.backend.exception.ErrorCode;
 import core.backend.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
 
@@ -60,5 +59,9 @@ public class MemberService {
         badgeInfo.put("currentCount", String.valueOf(currentReviewCount));
         badgeInfo.put("requiredCount", String.valueOf(requiredReviewCount));
         return badgeInfo;
+    }
+
+    public Integer getUserPercent(Long memberId){
+        return memberRepository.getUserReviewPercentile(memberId);
     }
 }
