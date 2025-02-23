@@ -95,7 +95,7 @@ public class AuthController {
         String refreshToken = jwtUtil.generateRefreshToken(foundMember);
 
         // refresh token db에 저장
-        foundMember.updateRefreshToken(refreshToken);
+        foundMember.setRefreshToken(refreshToken);
         memberRepository.save(foundMember);
 
         Map<String, String> tokens = new HashMap<>();
