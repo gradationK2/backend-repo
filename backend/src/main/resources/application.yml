@@ -7,7 +7,6 @@ spring:
 
   profiles:
     include: db
-
   jpa:
     hibernate:
       ddl-auto: update

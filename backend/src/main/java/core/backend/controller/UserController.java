@@ -6,11 +6,11 @@ import core.backend.dto.UserProfileUpdateRequest;
 import core.backend.exception.CustomException;
 import core.backend.exception.ErrorCode;
 import core.backend.jwt.JwtUtil;
-import core.backend.repository.HeartRepository;
 import core.backend.repository.MemberRepository;
 import core.backend.service.HeartService;
 import core.backend.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import core.backend.domain.Member;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
+@Slf4j
 @RequiredArgsConstructor
 public class UserController {
     private final HeartService heartService;
@@ -33,28 +35,31 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    //현재 로그인한 사용자 프로필 조회
-//    @GetMapping("/me")
-//    public Member getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
-//        return memberRepository.findByEmail(userDetails.getUsername())
-//                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-//    }
-
     //현재 로그인한 사용자 프로필 수정
     @PutMapping("/me")
     public Map<String, String> updateUserProfile(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody UserProfileUpdateRequest updateRequest) {
+            @ModelAttribute UserProfileUpdateRequest updateRequest)  {
+        if (updateRequest == null) {
+            throw new CustomException(ErrorCode.INVALID_INPUT);
+        }
 
         //현재 로그인한 사용자 찾기
         Member member = memberRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         //입력된 값이 null이 아닐 경우에만 업데이트
-        if (updateRequest.getName() != null) member.setName(updateRequest.getName());
-        if (updateRequest.getPhotoUrl() != null) member.setPhotoUrl(updateRequest.getPhotoUrl());
-        if (updateRequest.getNationality() != null) member.setNationality(updateRequest.getNationality());
-
+        if (updateRequest.getName() != null) {
+            member.setName(updateRequest.getName());
+        }
+        if (updateRequest.getNationality() != null) {
+            member.setNationality(updateRequest.getNationality());
+        }
+        if (updateRequest.getImage() != null && !updateRequest.getImage().isEmpty()) {
+            String savedPath = memberService.updateProfileImage(member, updateRequest.getImage());
+            member.setPhotoUrl(savedPath);
+        }
+        // TODO : 사용자 실수로 들어간 공백 제거 (strip, trim 이용)
         //변경된 정보 저장
         memberRepository.save(member);
 
