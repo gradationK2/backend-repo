@@ -49,12 +49,12 @@ public class UserController {
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         //입력된 값이 null이 아닐 경우에만 업데이트
-        if (updateRequest.getName() != null && updateRequest.getName().trim().isEmpty()) {
-            log.info("Updating name to: {}", updateRequest.getName().trim());
+        if (updateRequest.getName() != null) {
+            log.info("Updating name to: {}", updateRequest.getName());
             member.setName(updateRequest.getName());
         }
-        if (updateRequest.getNationality() != null && updateRequest.getNationality().trim().isEmpty()) {
-            log.info("Updating nationality to: {}", updateRequest.getNationality().trim());
+        if (updateRequest.getNationality() != null) {
+            log.info("Updating nationality to: {}", updateRequest.getNationality());
             member.setNationality(updateRequest.getNationality());
         }
         if (updateRequest.getImage() != null && !updateRequest.getImage().isEmpty()) {
