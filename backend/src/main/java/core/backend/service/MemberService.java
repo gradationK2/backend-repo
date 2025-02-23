@@ -1,5 +1,10 @@
 package core.backend.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import core.backend.domain.BadgeType;
 import core.backend.domain.Member;
@@ -9,7 +14,9 @@ import core.backend.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
+import java.util.UUID;
 
 
 @Slf4j
@@ -17,6 +24,7 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final String UPLOAD_DIR = "/home/daun/profile-images/";
 
     public Member getUser(Long userId) {
         return memberRepository.findById(userId)
@@ -64,4 +72,40 @@ public class MemberService {
     public Integer getUserPercent(Long memberId){
         return memberRepository.getUserReviewPercentile(memberId);
     }
+    // 이미지 처리를 위한 메소드 추가
+    public String updateProfileImage(Member member, MultipartFile image) {
+        try {
+            Files.createDirectories(Paths.get(UPLOAD_DIR));
+            String savedPath = saveNewImage(image);
+            deleteExistingImage(member.getPhotoUrl());
+
+            member.setPhotoUrl(savedPath);
+            memberRepository.save(member);
+            return savedPath;
+        } catch (IOException e) {
+            throw new RuntimeException("이미지 처리 중 오류가 발생했습니다.", e);
+        }
+    }
+    private String saveNewImage(MultipartFile image) throws IOException {
+        String originalFilename = image.getOriginalFilename();
+        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String fileName = UUID.randomUUID() + extension;
+        Path filePath = Paths.get(UPLOAD_DIR + fileName);
+
+        Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        return "/profile-images/" + fileName;
+    }
+    private void deleteExistingImage(String currentPhotoUrl) {
+        if (currentPhotoUrl != null) {
+            try {
+                String oldFilePath = UPLOAD_DIR + currentPhotoUrl.substring(currentPhotoUrl.lastIndexOf("/") + 1);
+                Files.deleteIfExists(Paths.get(oldFilePath));
+            } catch (IOException e) {
+                log.warn("기존 이미지 삭제 중 오류 발생: {}", e.getMessage());
+            }
+        }
+    }
+
+
 }
