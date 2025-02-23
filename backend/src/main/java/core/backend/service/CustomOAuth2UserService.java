@@ -38,21 +38,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationException("OAuth2 로그인 실패: 이메일 정보를 가져올 수 없습니다.");
         }
 
-        //db에서 사용자 정보 확인(이메일기준)
-        Optional<Member> memberOptional = memberRepository.findByEmail(userInfo.getEmail());
-        Member member;
-
-        if(memberOptional.isPresent()){
-            //기존 회원이면 업데이트
-            member = memberOptional.get();
-        }else {
-            //신규 회원
-            member = registerNewUser(userInfo);
-        }
+        //사용자 정보 조회, 신규 가입
+        Member member = memberRepository.findByEmail(userInfo.getEmail())
+                .orElseGet(() -> registerNewUser(userInfo));
 
         //jwt 토큰 생성
-        String token = jwtUtil.generateToken(member);
-        System.out.println("Generated JWT Token: " + token);
+        String accessToken = jwtUtil.generateToken(member);
+        String refreshToken = jwtUtil.generateRefreshToken(member);
+        member.setRefreshToken(refreshToken);
+        memberRepository.save(member);
+
+        System.out.println("Generated JWT Token: " + accessToken);
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority(member.getRole().name())),

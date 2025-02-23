@@ -74,15 +74,28 @@ public class SecurityConfig {
 
                             //이메일로 member조회
                             Member member = memberRepository.findByEmail(email)
-                                            .orElseThrow(() -> new IllegalArgumentException("해당 이메일의 사용자가 존재하지 않습니다."));
+                                            .orElseGet(() -> {
+                                                Member newMember = Member.builder()
+                                                        .email(email)
+                                                        .name("구글사용자")
+                                                        .password("")
+                                                        .nationality("UNLNOWN")
+                                                        .role(core.backend.domain.RoleType.USER)
+                                                        .build();
+                                                return memberRepository.save(newMember);
+                                            });
 
                             System.out.println("사용자 정보 조회 성공(이메일): " + member.getEmail());
 
-                            String token = jwtUtil.generateToken(member);
-                            System.out.println("발급된 jwt토큰: " + token);
+                            String accessToken = jwtUtil.generateToken(member);
+                            String refreshToken = jwtUtil.generateRefreshToken(member);
+                            member.setRefreshToken(refreshToken);
+                            memberRepository.save(member);
+
+                            System.out.println("발급된 jwt토큰: " + accessToken);
 
                             response.setContentType("application/json; charset=UTF-8");
-                            response.getWriter().write("{\"token\": \"" + token + "\"}");
+                            response.getWriter().write("{\"accessToken\": \"" + accessToken + "\", \"refreshToken\": \"" + refreshToken + "\"}");
                         })
                 )
                 .exceptionHandling(exception -> exception
