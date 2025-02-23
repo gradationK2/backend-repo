@@ -10,6 +10,7 @@ import core.backend.repository.MemberRepository;
 import core.backend.service.HeartService;
 import core.backend.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
+@Slf4j
 @RequiredArgsConstructor
 public class UserController {
     private final HeartService heartService;
@@ -48,12 +50,15 @@ public class UserController {
 
         //입력된 값이 null이 아닐 경우에만 업데이트
         if (updateRequest.getName() != null && updateRequest.getName().trim().isEmpty()) {
+            log.info("Updating name to: {}", updateRequest.getName().trim());
             member.setName(updateRequest.getName());
         }
         if (updateRequest.getNationality() != null && updateRequest.getNationality().trim().isEmpty()) {
+            log.info("Updating nationality to: {}", updateRequest.getNationality().trim());
             member.setNationality(updateRequest.getNationality());
         }
         if (updateRequest.getImage() != null && !updateRequest.getImage().isEmpty()) {
+            log.info("Updating image to: {}", updateRequest.getImage().getOriginalFilename());
             String savedPath = memberService.updateProfileImage(member, updateRequest.getImage());
             member.setPhotoUrl(savedPath);
         }
