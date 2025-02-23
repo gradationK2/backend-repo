@@ -50,19 +50,16 @@ public class UserController {
 
         //입력된 값이 null이 아닐 경우에만 업데이트
         if (updateRequest.getName() != null) {
-            log.info("Updating name to: {}", updateRequest.getName());
             member.setName(updateRequest.getName());
         }
         if (updateRequest.getNationality() != null) {
-            log.info("Updating nationality to: {}", updateRequest.getNationality());
             member.setNationality(updateRequest.getNationality());
         }
         if (updateRequest.getImage() != null && !updateRequest.getImage().isEmpty()) {
-            log.info("Updating image to: {}", updateRequest.getImage().getOriginalFilename());
             String savedPath = memberService.updateProfileImage(member, updateRequest.getImage());
             member.setPhotoUrl(savedPath);
         }
-
+        // TODO : 사용자 실수로 들어간 공백 제거 (strip, trim 이용)
         //변경된 정보 저장
         memberRepository.save(member);
 
