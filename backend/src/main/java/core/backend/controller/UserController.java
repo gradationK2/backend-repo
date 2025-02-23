@@ -37,8 +37,7 @@ public class UserController {
     @PutMapping("/me")
     public Map<String, String> updateUserProfile(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestPart(value="userInfo", required = false) UserProfileUpdateRequest updateRequest,
-            @RequestPart(value = "image", required = false) MultipartFile image)  {
+            @ModelAttribute UserProfileUpdateRequest updateRequest)  {
         if (updateRequest == null) {
             throw new CustomException(ErrorCode.INVALID_INPUT);
         }
@@ -54,8 +53,8 @@ public class UserController {
         if (updateRequest.getNationality() != null && updateRequest.getNationality().trim().isEmpty()) {
             member.setNationality(updateRequest.getNationality());
         }
-        if (image != null && !image.isEmpty()) {
-            String savedPath = memberService.updateProfileImage(member, image);
+        if (updateRequest.getImage() != null && !updateRequest.getImage().isEmpty()) {
+            String savedPath = memberService.updateProfileImage(member, updateRequest.getImage());
             member.setPhotoUrl(savedPath);
         }
 
