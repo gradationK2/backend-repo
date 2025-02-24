@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class HeartController {
     private final HeartService heartService;
     private final MemberService memberService;

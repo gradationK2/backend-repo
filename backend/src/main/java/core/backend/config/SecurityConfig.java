@@ -42,7 +42,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) //CSRF 비활성화 (REST API에서는 필요 없음)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // cors 설정
+                .cors(cors -> cors.disable())
+                //.cors(cors -> cors.configurationSource(corsConfigurationSource())) // cors 설정
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //세션 비활성화 (JWT 인증 사용)
                 .authorizeHttpRequests(auth -> auth
                         //인증 없이 접근 가능
