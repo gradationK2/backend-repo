@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll() //로그인, 회원가입은 인증 없이 접근 가능
                         .requestMatchers("/api/food/**").permitAll() //음식 리스트, 상세 조회, 검색
+                        .requestMatchers("/api/foods/{foodId}").permitAll()
                         .requestMatchers("/api/food/upload").permitAll() // 파일 업로드는 인증 없이 접근 가능
                         .requestMatchers("/reviews/users/**").permitAll() //리뷰 조회는 로그인 없이 가능
                         .requestMatchers("/reviews/food/{foodId}").permitAll() // 특정 음식 리뷰 조회

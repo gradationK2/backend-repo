@@ -1,0 +1,58 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.2'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'core'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'  // JPA 사용
+    implementation 'org.springframework.boot:spring-boot-starter-web'  // Spring Boot Web (REST API)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'  // 데이터 검증 기능 추가
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Spring Security 관련 추가
+    implementation 'org.springframework.boot:spring-boot-starter-security'  // 스프링 시큐리티
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6' // 타임리프에서 스프링 시큐리티 사용
+    testImplementation 'org.springframework.security:spring-security-test' // 스프링 시큐리티 테스트용
+
+    // JJWT 라이브러리 추가 (JwtUtil.java)
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'  // JSON 처리를 위해 필요
+
+    // db엑셀 데이터 읽기
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+    implementation 'org.apache.commons:commons-csv:1.10.0'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-parameters"
+}
+
