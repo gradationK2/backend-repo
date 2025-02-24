@@ -35,6 +35,10 @@ public class ReviewService {
         return reviewRepository.findAllByMemberId(userId);
     }
 
+    public List<Review> getReviewsByFood(Long foodId){
+        return reviewRepository.findByFoodId(foodId);
+    }
+
     @Transactional
     public void createReview(Food food, Member member, String content, Integer spicyLevel) {
         //디버깅용 로그
