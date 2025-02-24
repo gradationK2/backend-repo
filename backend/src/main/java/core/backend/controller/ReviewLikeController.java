@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/reviews")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ReviewLikeController {
     private final ReviewService reviewService;
     private final MemberService memberService;
