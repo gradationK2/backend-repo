@@ -40,6 +40,24 @@ public class ReviewController {
         return ResponseEntity.ok().body(reviewService.getReviewsByUser(userId));
     }
 
+    @GetMapping("food/{foodId}")
+    public ResponseEntity<?> getReviewByFood(@PathVariable("foodId") Long foodId){
+        //음식 존재 확인
+        Food food = foodService.findFoodByID(foodId);
+        if(food == null){
+            log.error("음식 조회 실패: foodId={}", foodId);
+            throw new CustomException(ErrorCode.FOOD_NOT_FOUND);
+        }
+
+        //특정 음식에 대한 리뷰 조회
+        List<Review> reviews = reviewService.getReviewsByFood(foodId);
+
+        return ResponseEntity.ok().body(Map.of(
+                "message", "특정 음식 리뷰 조회 성공",
+                "reviews", reviews
+        ));
+    }
+
     @PostMapping
     public ResponseEntity<?> addReview(@Valid @RequestBody ReviewFormRequest request) {
         request.validate(); //요청데이터 확인

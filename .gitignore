@@ -1,3 +1,4 @@
 # DB config file : Not upload
 **/application-db.properties
+application-db.yml
 .env
