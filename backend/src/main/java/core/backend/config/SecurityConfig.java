@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/foods/{foodId}").permitAll()
                         .requestMatchers("/api/food/upload").permitAll() // 파일 업로드는 인증 없이 접근 가능
                         .requestMatchers("/reviews/users/**").permitAll() //리뷰 조회는 로그인 없이 가능
-                        .requestMatchers("/reviews/food/{foodId}").permitAll() // 특정 음식 리뷰 조회
+                        .requestMatchers("/reviews/food/*").permitAll() // 특정 음식 리뷰 조회
 
                         //인증 필요
                         .requestMatchers("/reviews").authenticated() //리뷰 작성, 수정, 삭제는 로그인 필요
