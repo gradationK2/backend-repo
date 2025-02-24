@@ -14,7 +14,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/food")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*", allowedHeaders = "*") // 외부 클라이언트에서도 접근 가능
 public class FoodController {
 
     private final FoodService foodService;
