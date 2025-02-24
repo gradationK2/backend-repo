@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/food/**").permitAll() //음식 리스트, 상세 조회, 검색
                         .requestMatchers("/api/food/upload").permitAll() // 파일 업로드는 인증 없이 접근 가능
                         .requestMatchers("/reviews/users/**").permitAll() //리뷰 조회는 로그인 없이 가능
+                        .requestMatchers("/reviews/food/{foodId}").permitAll() // 특정 음식 리뷰 조회
 
                         //인증 필요
                         .requestMatchers("/reviews").authenticated() //리뷰 작성, 수정, 삭제는 로그인 필요
@@ -116,10 +117,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 //        configuration.setAllowedOrigins(Arrays.asList("http://www.asd1.store"));
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOrigins(Arrays.asList("*")); ///////수정
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // 요청
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // 요청 /////수정
         configuration.setExposedHeaders(Arrays.asList("Authorization")); // 응답
+        configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
