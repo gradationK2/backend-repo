@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,10 +71,36 @@ public class AuthController {
         return ResponseEntity.ok("사용 가능한 이메일입니다.");
     }
 
+    //이메일 중복 확인 requestbody방식 추가
+    @PostMapping("/check-email")
+    public ResponseEntity<?> checkEmailPost(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        if (email == null || email.isEmpty()) {
+            return ResponseEntity.badRequest().body("이메일 값이 필요합니다.");
+        }
+        if (memberRepository.findByEmail(email).isPresent()) {
+            return ResponseEntity.badRequest().body("이미 사용 중인 이메일입니다.");
+        }
+        return ResponseEntity.ok("사용 가능한 이메일입니다.");
+    }
+
     //닉네임 중복 확인 API
     @GetMapping("/check-name")
     public ResponseEntity<?> checkName(@RequestParam(name = "name") String name){
         if(memberRepository.findByName(name).isPresent()){
+            return ResponseEntity.badRequest().body("이미 사용 중인 닉네임입니다.");
+        }
+        return ResponseEntity.ok("사용 가능한 닉네임입니다.");
+    }
+
+    //닉네임 중복 확인 requestbody방식 추가
+    @PostMapping("/check-name")
+    public ResponseEntity<?> checkNamePost(@RequestBody Map<String, String> request) {
+        String name = request.get("name");
+        if (name == null || name.isEmpty()) {
+            return ResponseEntity.badRequest().body("닉네임 값이 필요합니다.");
+        }
+        if (memberRepository.findByName(name).isPresent()) {
             return ResponseEntity.badRequest().body("이미 사용 중인 닉네임입니다.");
         }
         return ResponseEntity.ok("사용 가능한 닉네임입니다.");
