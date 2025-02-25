@@ -89,6 +89,7 @@ public class UserController {
         response.put("heartCount", String.valueOf(heartService.getHeartsByUser(member).size())); // TODO : member는 hearts 가지고 있지 않았나?
         response.put("badgeCount", String.valueOf(BadgeType.getBadgeCount(reviews)));
         response.put("percent", String.valueOf(userPercent));
+        response.put("badgeImagePath", member.getBadge().getImagePath());
 
         return ResponseEntity.ok().body(response);
     }
