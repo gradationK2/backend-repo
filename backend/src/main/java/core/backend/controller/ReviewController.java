@@ -71,8 +71,10 @@ public class ReviewController {
             throw new CustomException(ErrorCode.FOOD_NOT_FOUND);
         }
 
-        reviewService.createReview(food, member, request.getContent(), request.getSpicyLevel(), request.getImage());
-
+        Review review = reviewService.createReview(food, member, request.getContent(), request.getSpicyLevel());
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            review.setImgUrl(reviewService.saveNewImage(request.getImage()));
+        }
         int reviewCount = reviewService.getReviewsByUser(member.getId()).size();
         memberService.updateBadge(member, reviewCount);
 

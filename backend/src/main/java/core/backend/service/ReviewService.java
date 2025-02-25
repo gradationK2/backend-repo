@@ -48,7 +48,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public void createReview(Food food, Member member, String content, Integer spicyLevel, MultipartFile image) {
+    public Review createReview(Food food, Member member, String content, Integer spicyLevel) {
         //디버깅용 로그
         log.info("리뷰 생성 요청: food={}, member={}, content={}, spicyLevel={}",
                 food != null ? food.getId() : "NULL",
@@ -71,19 +71,13 @@ public class ReviewService {
             throw new CustomException(ErrorCode.INVALID_INPUT);
         }
 
-        String saveNewImage = null;
-        if (image != null && !image.isEmpty()) {
-            saveNewImage = saveNewImage(image);
-        }
-
         Review review = Review.builder()
                 .food(food)
                 .member(member)
                 .content(content)
                 .spicyLevel(spicyLevel)
-                .imgUrl(saveNewImage)
                 .build();
-        reviewRepository.save(review);
+        return reviewRepository.save(review);
     }
 
     public void updateReview(Long reviewId, String content, Integer spicyLevel) {
@@ -138,7 +132,7 @@ public class ReviewService {
         }
     }
 
-    private String saveNewImage(MultipartFile image) {
+    public String saveNewImage(MultipartFile image) {
         String originalFilename = image.getOriginalFilename();
         String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         String fileName = UUID.randomUUID() + extension;
