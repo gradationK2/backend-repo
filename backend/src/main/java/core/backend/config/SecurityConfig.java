@@ -57,9 +57,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/food/upload").permitAll() // 파일 업로드는 인증 없이 접근 가능
                         .requestMatchers("/reviews/users/**").permitAll() //리뷰 조회는 로그인 없이 가능
                         .requestMatchers("/reviews/food/*").permitAll() // 특정 음식 리뷰 조회
-                        .requestMatchers("/login-success", "/login-success/*").permitAll() // 구글 로그인 리다이렉트
-                        .requestMatchers("/login-failed", "/login-failed/*").permitAll()
-                        .requestMatchers("/login", "/login/*").permitAll()
+//                        .requestMatchers("/login-success", "/login-success/*").permitAll() // 구글 로그인 리다이렉트
+//                        .requestMatchers("/login-failed", "/login-failed/*").permitAll()
+                        .requestMatchers("/login", "/login/*", "/login/**").permitAll()
 
                         //인증 필요
                         .requestMatchers("/reviews").authenticated() //리뷰 작성, 수정, 삭제는 로그인 필요
@@ -102,7 +102,7 @@ public class SecurityConfig {
 
                             System.out.println("발급된 jwt토큰: " + accessToken);
 
-                            String redirectUrl = "https://asd1.store/login-success?accessToken="
+                            String redirectUrl = "https://asd1.store/login/success?accessToken="
                                     + accessToken + "&refreshToken=" + refreshToken;
                             System.out.println("리디렉트 URL: " + redirectUrl);
                             response.sendRedirect(redirectUrl);
@@ -112,7 +112,7 @@ public class SecurityConfig {
                                 .failureHandler(((request, response, exception) -> {
                                     //로그인 실패 시 리다이렉트 처리
                                     System.out.println("OAuth2 로그인 실패: " + exception.getMessage());
-                                    response.sendRedirect("https://asd1.store/login-failed");
+                                    response.sendRedirect("https://asd1.store/login/failed");
                                 }))
                 )
                 .exceptionHandling(exception -> exception
