@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -29,9 +31,9 @@ public class ReviewFormRequest {
     @Min(value = 1, message = "매운맛 단계는 최소 1 이상이어야합니다.")
     private Integer spicyLevel;
 
+    private List<MultipartFile> image;
     public void validate(){
         log.info("DTO검증: userId={}, foodId={}, content={}, spicyLevel={}",
                 userId, foodId, content, spicyLevel);
-        log.info("{foodId}");
     }
 }

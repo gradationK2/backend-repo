@@ -5,10 +5,7 @@ import java.util.*;
 import core.backend.domain.Food;
 import core.backend.domain.Member;
 import core.backend.domain.Review;
-import core.backend.dto.review.ReviewDeleteAllRequest;
-import core.backend.dto.review.ReviewDeleteRequest;
-import core.backend.dto.review.ReviewFormRequest;
-import core.backend.dto.review.ReviewUpdateRequest;
+import core.backend.dto.review.*;
 import core.backend.exception.CustomException;
 import core.backend.exception.ErrorCode;
 import core.backend.service.FoodService;
@@ -37,7 +34,7 @@ public class ReviewController {
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<?> getReviews(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok().body(reviewService.getReviewsByUser(userId));
+        return ResponseEntity.ok().body(reviewService.getReviewDTOsByUser(userId));
     }
 
     @GetMapping("food/{foodId}")
@@ -59,8 +56,8 @@ public class ReviewController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addReview(@Valid @RequestBody ReviewFormRequest request) {
-        request.validate(); //요청데이터 확인
+    public ResponseEntity<?> addReview(@Valid @ModelAttribute ReviewFormRequest request) { // TODO : MoedelAttribute <--> RequestBody
+//        request.validate(); //요청데이터 확인
         
         Member member = memberService.getUser(request.getUserId());
         Food food = foodService.findFoodByID(request.getFoodId());
@@ -71,8 +68,10 @@ public class ReviewController {
             throw new CustomException(ErrorCode.FOOD_NOT_FOUND);
         }
 
-        reviewService.createReview(food, member, request.getContent(), request.getSpicyLevel());
-
+        Review review = reviewService.createReview(food, member, request.getContent(), request.getSpicyLevel());
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            reviewService.saveNewImage(request.getImage(), review);
+        }
         int reviewCount = reviewService.getReviewsByUser(member.getId()).size();
         memberService.updateBadge(member, reviewCount);
 
@@ -93,7 +92,7 @@ public class ReviewController {
         Member member = review.getMember();
         reviewService.deleteReview(request.getReviewId());
         //전체 리뷰 리스트 갱신
-        List<Review> allReviews = reviewService.getReviews();
+        List<ReviewWithImagesDto> allReviews = reviewService.getReviews();
         //사용자의 리뷰 갱신
         int reviewCount = reviewService.getReviewsByUser(member.getId()).size();
         memberService.updateBadge(member, reviewCount);
