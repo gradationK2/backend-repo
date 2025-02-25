@@ -98,7 +98,7 @@ public class SecurityConfig {
 
                             System.out.println("발급된 jwt토큰: " + accessToken);
 
-                            String redirectUrl = "https://asd1.store/login-success?accessToken="
+                            String redirectUrl = "https://asd1.store:3000/login-success?accessToken="
                                     + accessToken + "&refreshToken=" + refreshToken;
                             System.out.println("리디렉트 URL: " + redirectUrl);
                             response.sendRedirect(redirectUrl);
