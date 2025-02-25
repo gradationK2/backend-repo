@@ -77,7 +77,8 @@ public class ReviewService {
                 .content(content)
                 .spicyLevel(spicyLevel)
                 .build();
-        return reviewRepository.save(review);
+        Review savedReview = reviewRepository.save(review);
+        return savedReview;
     }
 
     public void updateReview(Long reviewId, String content, Integer spicyLevel) {
