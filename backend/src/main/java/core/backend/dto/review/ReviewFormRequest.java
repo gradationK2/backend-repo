@@ -32,8 +32,13 @@ public class ReviewFormRequest {
 
     private MultipartFile image;
     public void validate(){
-        log.info("DTO검증: userId={}, foodId={}, content={}, spicyLevel={}, image's size={}",
-                userId, foodId, content, spicyLevel, image.getSize());
+        if (!this.image.isEmpty()){
+            log.info("DTO검증: userId={}, foodId={}, content={}, spicyLevel={}, image's size={}",
+                    userId, foodId, content, spicyLevel, image.getSize());
+        } else {
+            log.info("DTO검증: userId={}, foodId={}, content={}, spicyLevel={}, image's size=0",
+                    userId, foodId, content, spicyLevel);
+        }
         log.info("{foodId}");
     }
 }
