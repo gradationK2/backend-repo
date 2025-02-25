@@ -132,7 +132,7 @@ public class ReviewService {
         }
     }
 
-    public String saveNewImage(MultipartFile image) {
+    public void saveNewImage(MultipartFile image, Review review) {
         String originalFilename = image.getOriginalFilename();
         String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         String fileName = UUID.randomUUID() + extension;
@@ -143,7 +143,9 @@ public class ReviewService {
         } catch (IOException e) {
             throw new RuntimeException("사진 업로드 중 실패 - saveNewImage함수", e);
         }
-        return "/profile-images/" + fileName;
+        String newImageUrl = "/profile-images/" + fileName;
+        review.setImgUrl(newImageUrl);
+        reviewRepository.save(review);
     }
 
 }
