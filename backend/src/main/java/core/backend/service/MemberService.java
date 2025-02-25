@@ -72,6 +72,12 @@ public class MemberService {
     public Integer getUserPercent(Long memberId){
         return memberRepository.getUserReviewPercentile(memberId);
     }
+
+
+
+
+
+    // 사진 관련 메서드 (FIXME : 함수가 뒤죽박죽이네요 .. 시간되면 리팩토링 한 번 하겠습니다)
     // 이미지 처리를 위한 메소드 추가
     public String updateProfileImage(Member member, MultipartFile image) {
         try {
@@ -96,6 +102,7 @@ public class MemberService {
 
         return "/profile-images/" + fileName;
     }
+
     private void deleteExistingImage(String currentPhotoUrl) {
         if (currentPhotoUrl != null) {
             try {

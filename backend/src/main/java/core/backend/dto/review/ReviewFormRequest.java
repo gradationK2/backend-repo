@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -29,9 +30,10 @@ public class ReviewFormRequest {
     @Min(value = 1, message = "매운맛 단계는 최소 1 이상이어야합니다.")
     private Integer spicyLevel;
 
+    private MultipartFile image;
     public void validate(){
-        log.info("DTO검증: userId={}, foodId={}, content={}, spicyLevel={}",
-                userId, foodId, content, spicyLevel);
+        log.info("DTO검증: userId={}, foodId={}, content={}, spicyLevel={}, image's size={}",
+                userId, foodId, content, spicyLevel, image.getSize());
         log.info("{foodId}");
     }
 }

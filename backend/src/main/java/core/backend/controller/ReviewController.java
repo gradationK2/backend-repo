@@ -59,7 +59,7 @@ public class ReviewController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addReview(@Valid @RequestBody ReviewFormRequest request) {
+    public ResponseEntity<?> addReview(@Valid @ModelAttribute ReviewFormRequest request) { // TODO : MoedelAttribute <--> RequestBody
         request.validate(); //요청데이터 확인
         
         Member member = memberService.getUser(request.getUserId());
@@ -71,7 +71,7 @@ public class ReviewController {
             throw new CustomException(ErrorCode.FOOD_NOT_FOUND);
         }
 
-        reviewService.createReview(food, member, request.getContent(), request.getSpicyLevel());
+        reviewService.createReview(food, member, request.getContent(), request.getSpicyLevel(), request.getImage());
 
         int reviewCount = reviewService.getReviewsByUser(member.getId()).size();
         memberService.updateBadge(member, reviewCount);
