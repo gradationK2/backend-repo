@@ -184,8 +184,6 @@ public class FoodService {
     public List<Food> getFoods(String category, String sort){
         List<Food> foods = (category != null) ? foodRepository.findByCategory(category) : foodRepository.findAll();
 
-        foods = foodRepository.findAll(); // 최신 데이터 반영
-
         // 정렬 기준 적용(기본값: 인기순)
         if (sort == null || "popular".equalsIgnoreCase(sort)){
             //좋아요 개수를 기준으로 내림차순 정렬
