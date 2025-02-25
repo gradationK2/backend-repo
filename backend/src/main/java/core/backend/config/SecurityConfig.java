@@ -102,7 +102,7 @@ public class SecurityConfig {
 
                             System.out.println("발급된 jwt토큰: " + accessToken);
 
-                            String redirectUrl = "https://asd1.store/login/success?accessToken="
+                            String redirectUrl = "http://localhost:3000/login/success?accessToken="
                                     + accessToken + "&refreshToken=" + refreshToken;
                             System.out.println("리디렉트 URL: " + redirectUrl);
                             response.sendRedirect(redirectUrl);
@@ -112,7 +112,7 @@ public class SecurityConfig {
                                 .failureHandler(((request, response, exception) -> {
                                     //로그인 실패 시 리다이렉트 처리
                                     System.out.println("OAuth2 로그인 실패: " + exception.getMessage());
-                                    response.sendRedirect("https://asd1.store/login/failed");
+                                    response.sendRedirect("http://localhost:3000/login/failed");
                                 }))
                 )
                 .exceptionHandling(exception -> exception
