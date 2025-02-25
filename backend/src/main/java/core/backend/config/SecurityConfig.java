@@ -3,6 +3,8 @@ package core.backend.config;
 
 import core.backend.domain.Member;
 import java.util.Arrays;
+
+import core.backend.domain.RoleType;
 import core.backend.jwt.JwtFilter;
 import core.backend.jwt.JwtUtil;
 import core.backend.repository.MemberRepository;
@@ -85,7 +87,7 @@ public class SecurityConfig {
                                                         .name("구글사용자")
                                                         .password("")
                                                         .nationality("UNLNOWN")
-                                                        .role(core.backend.domain.RoleType.USER)
+                                                        .role(RoleType.USER)
                                                         .build();
                                                 return memberRepository.save(newMember);
                                             });
@@ -106,6 +108,11 @@ public class SecurityConfig {
 //                            response.setContentType("application/json; charset=UTF-8");
 //                            response.getWriter().write("{\"accessToken\": \"" + accessToken + "\", \"refreshToken\": \"" + refreshToken + "\"}");
                         })
+                                .failureHandler(((request, response, exception) -> {
+                                    //로그인 실패 시 리다이렉트 처리
+                                    System.out.println("OAuth2 로그인 실패: " + exception.getMessage());
+                                    response.sendRedirect("https://asd1.store:3000/login-failed");
+                                }))
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
