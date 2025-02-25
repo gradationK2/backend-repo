@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -30,15 +31,9 @@ public class ReviewFormRequest {
     @Min(value = 1, message = "매운맛 단계는 최소 1 이상이어야합니다.")
     private Integer spicyLevel;
 
-    private MultipartFile image;
+    private List<MultipartFile> image;
     public void validate(){
-        if (this.image.isEmpty()){
-            log.info("DTO검증: userId={}, foodId={}, content={}, spicyLevel={}, image's size=0",
-                    userId, foodId, content, spicyLevel);
-        } else {
-            log.info("DTO검증: userId={}, foodId={}, content={}, spicyLevel={}, image's size={}",
-                    userId, foodId, content, spicyLevel, image.getSize());
-        }
-        log.info("{foodId}");
+        log.info("DTO검증: userId={}, foodId={}, content={}, spicyLevel={}",
+                userId, foodId, content, spicyLevel);
     }
 }
