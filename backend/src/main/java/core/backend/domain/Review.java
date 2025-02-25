@@ -48,6 +48,8 @@ public class Review {
 
     private Integer downvote;
 
+    @Column(name="photo_url")
+    private String imgUrl;
     
     @Column(nullable = false)
     private Integer spicyLevel; // 1~5단계 매운맛 평가
