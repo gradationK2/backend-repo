@@ -73,7 +73,7 @@ public class ReviewController {
 
         Review review = reviewService.createReview(food, member, request.getContent(), request.getSpicyLevel());
         if (request.getImage() != null && !request.getImage().isEmpty()) {
-            review.setImgUrl(reviewService.saveNewImage(request.getImage()));
+            reviewService.saveNewImage(request.getImage(), review);
         }
         int reviewCount = reviewService.getReviewsByUser(member.getId()).size();
         memberService.updateBadge(member, reviewCount);

@@ -83,7 +83,7 @@ public class UserController {
         response.put("role", member.getRole().name());
         response.put("nationality", member.getNationality());
         response.put("createDate", member.getCreateDate().toString());
-        response.put("badge", member.getBadge().name());
+        response.put("badge", member.getBadge().name() != null ? member.getBadge().name() : "");
         response.put("profileImagePath", member.getPhotoUrl() != null ? member.getPhotoUrl() : "");
         response.put("reviewCount", String.valueOf(reviews));
         response.put("heartCount", String.valueOf(heartService.getHeartsByUser(member).size())); // TODO : member는 hearts 가지고 있지 않았나?
