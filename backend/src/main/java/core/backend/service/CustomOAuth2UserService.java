@@ -1,5 +1,6 @@
 package core.backend.service;
 
+import core.backend.domain.BadgeType;
 import core.backend.domain.Member;
 import core.backend.domain.RoleType;
 import core.backend.jwt.JwtUtil;
@@ -64,6 +65,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .password("")
                 .nationality("UNKNOWN")
                 .role(RoleType.USER)
+                .badge(BadgeType.REVIEW_0)
                 .build();
         return memberRepository.save(member);
     }
