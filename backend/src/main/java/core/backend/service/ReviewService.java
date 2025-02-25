@@ -8,10 +8,12 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import core.backend.domain.Food;
 import core.backend.domain.Member;
 import core.backend.domain.Review;
+import core.backend.dto.review.ReviewWithImagesDto;
 import core.backend.exception.CustomException;
 import core.backend.exception.ErrorCode;
 import core.backend.repository.ReviewLikeRepository;
@@ -30,8 +32,19 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final String UPLOAD_DIR = "/home/daun/profile-images/";
 
-    public List<Review> getReviews() {
-        return reviewRepository.findAll();
+    public List<ReviewWithImagesDto> getReviews() {
+//        return reviewRepository.findAll();
+        List<Review> reviews = reviewRepository.findAll();
+        return reviews.stream()
+                .map(ReviewWithImagesDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public List<ReviewWithImagesDto> getReviewDTOsByUser(Long userId) {
+        List<Review> reviews = reviewRepository.findAllByMemberId(userId);
+        return reviews.stream()
+                .map(ReviewWithImagesDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
     public Review getReviewByReview(Long reviewId) {
@@ -77,8 +90,7 @@ public class ReviewService {
                 .content(content)
                 .spicyLevel(spicyLevel)
                 .build();
-        Review savedReview = reviewRepository.save(review);
-        return savedReview;
+        return reviewRepository.save(review);
     }
 
     public void updateReview(Long reviewId, String content, Integer spicyLevel) {
@@ -133,21 +145,41 @@ public class ReviewService {
         }
     }
 
-    public void saveNewImage(MultipartFile image, Review review) {
-        String originalFilename = image.getOriginalFilename();
-        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        String fileName = UUID.randomUUID() + extension;
-        Path filePath = Paths.get(UPLOAD_DIR + fileName);
-
-        try {
-            Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new RuntimeException("사진 업로드 중 실패 - saveNewImage함수", e);
+    @Transactional
+    public void saveNewImage(List<MultipartFile> images, Review review) {
+        if (images == null || images.isEmpty()) {
+            return;
         }
-        String newImageUrl = "/profile-images/" + fileName;
-        review.setImgUrl(newImageUrl);
+        StringBuilder urls = new StringBuilder();
+        for (MultipartFile image : images) {
+            if (image != null && !image.isEmpty()) {
+                String originalFilename = image.getOriginalFilename();
+                String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                String fileName = UUID.randomUUID() + extension;
+                Path filePath = Paths.get(UPLOAD_DIR + fileName);
+
+                try {
+                    Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                    String newImageUrl = "/profile-images/" + fileName;
+
+                    // 엔티티 하나 만들기 보다 급하게.. 하려고 리뷰 엔티티의 photo_url에 여러 문자열 집어넣기
+                    if (urls.length() > 0) {
+                        urls.append("|");  // 공백보다 | 같은 특수문자가 더 안전한 구분자
+                    }
+                    urls.append(newImageUrl);
+
+                } catch (IOException e) {
+                    throw new RuntimeException("사진 업로드 중 실패", e);
+                }
+            }
+        }
+        // 기존 URL이 있으면 함께 저장
+        if (review.getImgUrl() != null && !review.getImgUrl().isEmpty()) {
+            urls.insert(0, review.getImgUrl() + "|");
+        }
+
+        review.setImgUrl(urls.toString());
         reviewRepository.save(review);
     }
-
 }
 
